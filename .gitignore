@@ -1,0 +1,3 @@
+# Ignores the pycache Folder; Not nessary for version control
+__pycache__/
+*.pyc
