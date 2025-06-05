@@ -1,14 +1,17 @@
 from tkinter import *
+from tkinter import messagebox
 
 class RootGUI:
     def __init__(self):
+        '''Initalizes the root window for the GUI and communications of the program'''
         self.root = Tk()
         self.root.title("Serial Communication")
         self.root.geometry("360x120")
         self.root.config(bg="white")
 
 class ComGUI():
-    def __init__(self, root,serial):
+    def __init__(self, root, serial):
+        '''     Initalizes the connection to the GUI and main widgets   '''
         # Frame
         self.root=root
         self.serial=serial
@@ -30,11 +33,11 @@ class ComGUI():
         self.publish()
 
     def ComOptionMenu(self):
-        coms=["-", "COM3", "COM4", "COM5"]
-        self.click_com=StringVar()  #  StringVar() is used to edit a widget's text
-        self.click_com.set(coms[0])
+        self.serial.getCOMList()                    # With the getCOMList() function we no longer need the hard coded values of different ports
+        self.click_com=StringVar()                  # StringVar() is used to edit a widget's text
+        self.click_com.set(self.serial.com_list[0]) # Instead of reference the previous (com[0]) we can reference the self variable which has com_list as a child
         self.drop_com = OptionMenu(
-            self.frame, self.click_com, *coms, command=self.connect_ctrl
+            self.frame, self.click_com, *self.serial.com_list, command=self.connect_ctrl
         )
         self.drop_com.config(width=10)
     
@@ -64,10 +67,41 @@ class ComGUI():
             self.btn_connect["state"] = "active"
 
     def com_refresh(self):
+        self.drop_com.destroy()
+
+        self.ComOptionMenu()
+        self.drop_com.grid(column=2,row=2,padx=self.padx,pady=self.pady)
+        
+        logic=[]
+        self.connect_ctrl(logic)
         print("Refresh")
 
     def serial_connect(self):
-        print("Connect")
+        if self.btn_connect["text"] in "Connect":
+            # start the connection
+            self.serial.SerialOpen(self)
+            # if there is a conncetion established
+            if self.serial.ser.status:
+                # Updates the COM manager
+                self.btn_connect["text"] = "Disconnect"
+                self.btn_refresh["state"] = "disable"
+                self.drop_baud["state"] = "disable"
+                self.drop_com["state"] = "disable"
+                InfoMsg=f"Successful UART connection using {self.click_com.get()}"
+                messagebox.showinfo("showinfo",InfoMsg)
+            else:
+                ErrorMsg=f"Failure to estabish UART connection using {self.click_com.get()} "
+                messagebox.showerror("showerror", ErrorMsg)
+        else:
+            # close the connection
+            self.serial.SerialClose(self)
+
+            InfoMsg = f"UART connection using {self.click_com.get()} is now closed"
+            messagebox.showwarning("showinfo", InfoMsg)
+            self.btn_connect["text"] = "Connect"
+            self.btn_refresh["state"] = "active"
+            self.drop_baud["state"] = "active"
+            self.drop_com["state"] = "active"
 
 if __name__ == "main":
     RootGUI()
