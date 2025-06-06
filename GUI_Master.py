@@ -121,7 +121,7 @@ class ComGUI():
 
             self.conn.ConnGUIClose()
             self.data.ClearData()
-            
+
             InfoMsg = f"UART connection using {self.click_com.get()} is now closed"
             messagebox.showwarning("showinfo", InfoMsg)
             self.btn_connect["text"] = "Connect"
@@ -199,17 +199,115 @@ class ConnGUI():
         pass
 
     def new_chart(self):
-        pass
+        try:
+            self.chartMaster.AddChannelMaster()
+        except:
+            self.chartMaster=DisGUI(self.root, self.serial, self.data)
 
     def kill_chart(self):
-        pass
+        try:
+            if len(self.chartMaster.frames) > 0:
+                totalFrame = len(self.chartMaster.frames)-1
+                self.chartMaster.frames[totalFrame].destroy()
+                self.chartMaster.frames.pop()
+                self.chartMaster.figs.pop()
+                self.chartMaster.ControlFrames.pop()
+                self.chartMaster.AdjustRootFrame()
+        except:
+            pass
 
     def save_data(self):
         pass
 
+class DisGUI():
+    def __init__(self, root, serial, data):
+        self.root = root
+        self.serial = serial
+        self.data = data
+        # Master Frame controls
+        self.frames = []
+        self.framesCol = 0
+        self.framesRow = 4
+        self.totalframes = 0
 
+        self.figs = []
 
+        # The control Frame
+        self.ControlFrames = []
+
+    def AddChannelMaster(self):
+        self.AddMasterFrame()
+        self.AdjustRootFrame()
+        self.AddGraph()
+        self.AddBtnFrame()
+
+    def AddMasterFrame(self):
+        self.frames.append(LabelFrame(self.root, text=f"Display Manager-{len(self.frames)+1}",
+                                      pady=5, padx=5, bg="white"))
+        self.totalframes = len(self.frames)-1
+        # print(f'Total frames:{self.totalframes}')
+        if self.totalframes % 2 == 0:
+            self.framesCol = 0
+        else:
+            self.framesCol = 9
+        # print(f'Col: {self.framesCol}')
+        self.framesRow = 4 + 4 * int(self.totalframes / 2)
+        # print(f'Row: {self.framesRow}')
+        self.frames[self.totalframes].grid(padx=5,
+                                           column=self.framesCol, row=self.framesRow, columnspan=8, sticky=NW)
+    def AdjustRootFrame(self):
+        '''
+        This Method will generate the code related to adjusting
+        the main root Gui based on the number of added GUI
+        '''
+        self.totalframes = len(self.frames)-1
+        if self.totalframes > 0:
+            RootW = 800*2
+
+        else:
+            RootW = 800
+
+        if self.totalframes+1 == 0:
+            RootH = 120
+        else:
+            RootH = 120 + 430 * (int(self.totalframes/2)+1)
+        self.root.geometry(f"{RootW}x{RootH}") 
+    
+    def AddGraph(self):
+        # Setting up the plot for the each Frame
+        self.figs.append([])
+        # Initialize figures
+        self.figs[self.totalframes].append(plt.Figure(figsize=(7, 5), dpi=80))
+        # Initialize the plot
+        self.figs[self.totalframes].append(
+            self.figs[self.totalframes][0].add_subplot(111))
+        # Initialize the chart
+        self.figs[self.totalframes].append(FigureCanvasTkAgg(
+            self.figs[self.totalframes][0], master=self.frames[self.totalframes]))
+
+        self.figs[self.totalframes][2].get_tk_widget().grid(
+            column=1, row=0, columnspan=4, rowspan=17,  sticky=N)
+
+    def AddBtnFrame(self):
+        btnH = 2
+        btnW = 4
+        self.ControlFrames.append([])
+        self.ControlFrames[self.totalframes].append(LabelFrame(self.frames[self.totalframes],
+                                                               pady=5, bg="white"))
+        self.ControlFrames[self.totalframes][0].grid(
+            column=0, row=0, padx=5, pady=5,  sticky=N)
+
+        self.ControlFrames[self.totalframes].append(Button(self.ControlFrames[self.totalframes][0], text="+",
+                                                           bg="white", width=btnW, height=btnH))
+        self.ControlFrames[self.totalframes][1].grid(
+            column=0, row=0, padx=5, pady=5)
+        self.ControlFrames[self.totalframes].append(Button(self.ControlFrames[self.totalframes][0], text="-",
+                                                           bg="white", width=btnW, height=btnH))
+        self.ControlFrames[self.totalframes][2].grid(
+            column=1, row=0, padx=5, pady=5)
+        
 if __name__ == "main":
     RootGUI()
     ComGUI()
     ConnGUI()
+    DisGUI()

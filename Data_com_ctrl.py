@@ -12,10 +12,15 @@ class DataMaster():
         self.YData = []
 
     def DecodeMsg(self):
-        temp=self.RowMsg.decode('utf8')
+        '''
+            Method used to get the message coming from UART and converted to a python string
+            it is also used to get defferent type of messages based on the Message protocol
+            '''
+        temp = self.RowMsg.decode('utf-8', errors='ignore')
         if len(temp) > 0:
             if "#" in temp:
-                self.msg=temp.spilt("#")
+                self.msg = temp.split("#")
+                # print(self.msg)
                 del self.msg[0]
 
     def GenChannels(self):
