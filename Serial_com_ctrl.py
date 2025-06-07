@@ -11,9 +11,6 @@ class SerialCtrl():
         self.com_list.insert(0, "-")
 
     def SerialOpen(self, ComGUI):
-        '''
-            Attempts to open the serial port using settings from the GUI. If not already open, initializes and opens the port. Sets status accordingly.
-        '''
         try: 
             PORT=ComGUI.click_com.get()
             BAUD=ComGUI.click_baud.get()
