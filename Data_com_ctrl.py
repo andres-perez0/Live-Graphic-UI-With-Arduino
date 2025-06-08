@@ -15,16 +15,20 @@ class DataMaster():
         temp = self.RowMsg.decode('utf-8', errors='ignore')
         if len(temp) > 0:
             if "#" in temp:
+                # checks if valid seperator is present in the RowMsg
                 self.msg = temp.split("#")
-                # print(self.msg)
+                # As the initial list will look similar to "#CH1#CH2#" -> ['', 'CH1', 'CH2', '']; 
+                # deleting the first index would make it more workable ['CH1', 'CH2', '']  
                 del self.msg[0]
 
     def GenChannels(self):
+        ''' Creates a list of channels based on the number of SynchChannel
+        ["Ch0","Ch1","Ch2"] up too SynchChannel-1 '''
         self.Channels=[f"Ch{ch}" for ch in range(self.SynchChannel)]
 
     def BuildYData(self):
-        for _ in range(self.SynchChannel):
-            self.YData.append([])
+        ''' Creates an YData list also based on the number of SynchChannel  '''
+        self.YData = [[] for idy in range(self.SynchChannel)]
 
     def ClearData(self):
         self.RowMsg = ""

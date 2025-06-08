@@ -16,8 +16,8 @@ class RootGUI:
         self.root.config(bg="white")
         self.serial=serial
         self.data=data
-
-        self.root.protocol("WM_DELETE_WINDOW", self.close_window)   # Prevents the user from exiting during processes (threads)
+        # Prevents the user from exiting during processes (threads)
+        self.root.protocol("WM_DELETE_WINDOW", self.close_window)   
 
     def close_window(self):
         print("Closing the window and exit")
@@ -27,8 +27,8 @@ class RootGUI:
 
 class ComGUI():
     def __init__(self, root, serial, data):
-        '''     Initalizes the connection to the GUI and main widgets   '''
-        # Frame
+        '''=Initalizes the connection to the GUI and main widgets'''
+        # Includes the main frame, serial communication information, and data
         self.root=root
         self.serial=serial
         self.data=data
@@ -75,21 +75,24 @@ class ComGUI():
         self.drop_baud.config(width=10)   
 
     def connect_ctrl(self, widget):
-        print("Connect ctrl")
+        # print("Connect ctrl")
         if "-" in self.click_baud.get() or "-" in self.click_com.get():
             self.btn_connect["state"] = "disable"
         else: 
             self.btn_connect["state"] = "active"
 
     def com_refresh(self):
+        # Properly destroyed the previous drop_com to ensure it doesnt stay in memory
         self.drop_com.destroy()
-
+        # Calls to refresh the available COM ports 
         self.ComOptionMenu()
+        # Replaces it on the grid
         self.drop_com.grid(column=2,row=2,padx=self.padx,pady=self.pady)
         
         logic=[]
+        # Revalutes the state of the "connect" button
         self.connect_ctrl(logic)
-        print("Refresh")
+        # print("Refresh")
 
     def serial_connect(self):
         if self.btn_connect["text"] in "Connect":
@@ -144,16 +147,14 @@ class ConnGUI():
         self.ch_status = Label(self.frame, text="...", bg="white", fg="orange", width=5)
 
         self.btn_start_stream = Button(self.frame, text="Start", state="disabled", width=5, command=self.start_stream)
-
         self.btn_stop_stream = Button(self.frame, text="Stop", state="disabled", width=5, command=self.stop_stream)
-
         self.btn_add_chart = Button(self.frame, text="+", state="disabled", width=5, bg="white", fg="#098577", command=self.new_chart)
-
         self.btn_kill_chart = Button(self.frame, text="-", state="disabled", width=5, bg="white", fg="#CC252C", command=self.kill_chart)
 
         self.save = False
         self.SaveVar = IntVar()
         self.save_check = Checkbutton(self.frame, text="Save data", variable=self.SaveVar, onvalue=1, offvalue=0, bg="white", state="disabled", command=self.save_data)
+        # ttk.Seperator is what seperates the two widgets into two columns
         self.separator = ttk.Separator(self.frame, orient='vertical')
 
         # Optional Graphic parameters

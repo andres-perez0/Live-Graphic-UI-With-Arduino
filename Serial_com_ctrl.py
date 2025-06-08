@@ -11,17 +11,21 @@ class SerialCtrl():
         self.com_list.insert(0, "-")
 
     def SerialOpen(self, ComGUI):
-        try: 
+        '''
+        Tries to access self.ser.is_open, if it fails it initialzes the variable with the 
+        GUI information
+        '''
+        try:
+            self.ser.is_open
+        except:
             PORT=ComGUI.click_com.get()
             BAUD=ComGUI.click_baud.get()
             self.ser=serial.Serial()
             self.ser.port=PORT  
             self.ser.baudrate=BAUD
             self.ser.timeout=0.1
-            self.ser.open()                 
+            self.ser.open()                # Attempts to open the serial point           
             self.ser.status=True
-        except:
-            self.ser.status=False
 
         try:
             # Check if serial object exists and is open
@@ -43,6 +47,9 @@ class SerialCtrl():
             self.ser.status=False
 
     def SerialClose(self, ComGUI):
+        '''
+            if the custom attribute(is_open) is true, then closs the serial port
+        '''
         try:
             if self.ser.is_open:
                 self.ser.close()
