@@ -57,8 +57,12 @@ class SerialCtrl():
         except:
             self.ser.status=False
 
+    def SerialStop(self, gui):
+        self.ser.write(gui.data.StopStream.encode())
+
     def SerialSync(self, gui):
         self.threading = True
+        time.sleep(0.2)
         cnt = 0
         while self.threading:
             try:
@@ -66,7 +70,6 @@ class SerialCtrl():
                 gui.conn.sync_status["text"] = "..Sync.."
                 gui.conn.sync_status["fg"] = "orange"
                 gui.data.RowMsg = self.ser.readline()
-                # print(f"RowMsg: {gui.data.RowMsg}")
                 gui.data.DecodeMsg()
                 if gui.data.sync_ok in gui.data.msg[0]:
                     if int(gui.data.msg[1]) > 0:
@@ -96,8 +99,41 @@ class SerialCtrl():
                 gui.conn.sync_status["text"] = "failed"
                 gui.conn.sync_status["fg"] = "red"
                 time.sleep(0.5)
+
                 if self.threading == False:
                     break   
 
-if __name__=="__main__":
-    SerialCtrl()
+    def SerialDataStream(self, gui):
+        self.threading = True
+        cnt = 0
+        while self.threading:
+            try:
+                self.ser.write(gui.data.StartStream.encode())
+                gui.data.RowMsg = self.ser.readline()
+                gui.data.DecodeMsg()
+                gui.data.StreamDataCheck()
+                if gui.data.StreamData:
+                    gui.data.SetRefTime()
+                    break
+            except Exception as e:
+                print(e)
+            
+        gui.UpdateChart()
+        while self.threading:
+            try:
+                gui.data.RowMsg = self.ser.readline()
+                gui.data.DecodeMsg()
+                gui.data.StreamDataCheck()
+                if gui.data.StreamData:
+                    gui.data.UpdataXdata()
+                    gui.data.UpdataYdata()
+                    # Ysam = [Ys[len(gui.data.XData)-1] for Ys in gui.data.YData]
+                    gui.data.AdjustData()
+                    # print(
+                    #     f"X Len: {len(gui.data.XData)}, Xstart:{gui.data.XData[0]}  Xend : {gui.data.XData[len(gui.data.XData)-1]}, Xrange: {gui.data.XData[len(gui.data.XData)-1] - gui.data.XData[0]} Ydata len: {len(gui.data.YData[0])} Yval: : {Ysam} ")
+            except Exception as e:
+                print(e)
+
+# Should I add this?
+# if __name__ == "__main__":
+#     SerialCtrl()
