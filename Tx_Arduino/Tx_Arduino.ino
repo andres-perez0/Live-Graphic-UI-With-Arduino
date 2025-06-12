@@ -14,13 +14,14 @@ bool isStreaming=false;
 
 void setup() {
   Serial.begin(9600);
-  while(!Serial);         // Waits for serial port to connect
-}
+  delay(100); 
+  Serial.println("Arduino Ready"); 
+  }
 
 void loop() {
   if (Serial.available()) {
-    command=Serial.readStringUntil('\n'); // Reads Serial port
-    command.trim();                        // Elimates white space from Serial Message
+    command=Serial.readStringUntil('\n'); 
+    command.trim();
     
     if (command==SYNC_REQUEST){
       // Sync Requests
@@ -30,17 +31,18 @@ void loop() {
     } else if (command==START_STREAM) {
       // Start Stream
       isStreaming=true;
+      Serial.println("Streaming Started");
     } else if (command==STOP_STREAM) {
       // Stop Stream
       isStreaming=false;
+      Serial.println("Streaming Stopped");
     }
-
-    /*
-      Insert Body Code
-        Implement the MPU9250   
-    */
-
   }
-  // put your main code here, to run repeatedly:
 
+  // Serial.println(isStreaming);
+  
+  if (isStreaming) {
+    Serial.println("hello world");
+    delay(100);
+  }
 }
