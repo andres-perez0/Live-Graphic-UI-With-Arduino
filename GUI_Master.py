@@ -114,9 +114,11 @@ class ComGUI():
                 self.drop_com["state"] = "disable"
                 InfoMsg=f"Successful UART connection using {self.click_com.get()}"
                 messagebox.showinfo("showinfo",InfoMsg)
-
+                
+                # Displays the channel manager
                 self.conn = ConnGUI(self.root, self.serial, self.data)
 
+                # Utlizes threading to read the data "simulatious" with the UI
                 self.serial.t1=threading.Thread(target=self.serial.SerialSync,args=(self,),daemon=True)
                 self.serial.t1.start()
 

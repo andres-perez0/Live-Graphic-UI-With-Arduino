@@ -7,10 +7,12 @@
 import serial
 import time
 
+## Port Infomartion
 SERIAL_PORT="COM3"
-BAUD_RATE=9600
+BAUD_RATE=115200
 TIMEOUT=0.1
 
+## Serial Communication Statements
 SYNC_REQUEST = "#?#\n"
 SYNC_OK_PREFIX = "#!#"
 START_STREAM = "#A#\n"
@@ -26,6 +28,10 @@ def main():
             if line == "Arduino Ready":
                 print(f"Arduino says: {line}")
                 break
+            elif line:
+                print(f"Arduino says: {line}")
+            else:
+                pass
             time.sleep(0.1)
 
         print(f"Sending START_STREAM command: {START_STREAM.strip()}")
@@ -38,7 +44,8 @@ def main():
         while True:
             try:
                 output_line = arduino.readline().decode('utf-8').strip()
-                print(f"Arduino says: {output_line}")
+                if output_line:
+                    print(f"Arduino says: {output_line}")
             except KeyboardInterrupt:
                 print(f"User Stopped. Sending STOP_STREAM command: {START_STREAM.strip()}")
                 arduino.write(STOP_STREAM.encode('utf-8'))
