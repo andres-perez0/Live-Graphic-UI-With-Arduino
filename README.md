@@ -13,7 +13,6 @@ A dynamic data visualization tool I intend to use to work with sensors and elect
 │   └── test.py
 └── .gitignore 
 └── LICENSE
-└── master.py
 ```
 
 Copyright 2025 - Present Andres Perez 
